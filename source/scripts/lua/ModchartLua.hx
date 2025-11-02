@@ -6,10 +6,10 @@ import flixel.tweens.FlxEase;
 import flixel.FlxG;
 
 class ModchartLua {
-    public static function implement(lua:FunkinLua):Void {
-        if (lua == null) {
-            FlxG.log.warn("[ModchartLua] Skipped — Lua instance is null!");
-            return;
+    public static function implement(lua:llua.State):Void {
+        if (lua != null)
+        {
+        Lua.call(lua, funcName, []); // directly call Lua function
         }
 
         // Ensure Manager singleton exists
