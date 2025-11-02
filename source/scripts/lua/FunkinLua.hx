@@ -34,6 +34,8 @@ import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepadInputID;
 import haxe.Json;
 
+import modchart.backend.standalone.Adapter;
+
 class FunkinLua
 {
 	public var lua:State = null;
@@ -56,6 +58,22 @@ class FunkinLua
 		var times:Float = Date.now().getTime();
 		lua = LuaL.newstate();
 		LuaL.openlibs(lua);
+
+		ModchartLua.implement(lua);
+
+		// 🧠 Register this Lua instance with the Modchart backend adapter
+    if (modchart.backend.standalone.Adapter.instance != null)
+    {
+        try {
+            modchart.backend.standalone.Adapter.instance.registerLuaInstance(lua);
+            trace('[Modchart] Lua instance registered successfully!');
+        } catch (e) {
+            trace('[Modchart] Failed to register Lua instance: ' + e);
+        }
+    }
+    else {
+        trace('[Modchart] Adapter instance is null! Skipping registerLuaInstance.');
+	}
 
 		// trace('Lua version: ' + Lua.version());
 		// trace("LuaJIT version: " + Lua.versionJIT());
