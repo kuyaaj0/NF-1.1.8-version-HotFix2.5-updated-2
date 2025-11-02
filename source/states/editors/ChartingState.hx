@@ -1859,11 +1859,11 @@ class ChartingState extends MusicBeatState
 	{
 		curStep = recalculateSteps();
 
-		if (DataGet.getMem() > 3000)
+		/*if (DataGet.getMem() > 3000)
 		{
 			System.gc();
 			timeCheck = false;
-		}
+		}*/
 
 		if (FlxG.sound.music.time < 0)
 		{
