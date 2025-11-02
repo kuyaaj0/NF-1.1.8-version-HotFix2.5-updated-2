@@ -85,6 +85,8 @@ class FunkinLua
 		if (game != null)
 			game.luaArray.push(this);
 
+		ModchartLua.implement(this);
+
 		var myFolder:Array<String> = this.scriptName.split('/');
 		#if MODS_ALLOWED
 		if (myFolder[0] + '/' == Paths.mods()
