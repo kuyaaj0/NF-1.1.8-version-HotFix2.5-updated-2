@@ -1226,6 +1226,7 @@ class PlayState extends MusicBeatState
 			addManager(modchart);
 			
 			// === Link Modchart Lua Functions (Psych Adapter) ===
+			#if LUA_ALLOWED
 			Adapter.init(); // Always initialize first (outside try)
 
 			try {
@@ -1239,6 +1240,7 @@ class PlayState extends MusicBeatState
 			} catch (e:Dynamic) {
 			trace("[Modchart] ❌ Failed to link Lua modchart functions: " + e);
 			}
+			#end
 
 			for (i in 0...playerStrums.length)
 			{
