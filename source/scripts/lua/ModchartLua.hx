@@ -6,7 +6,7 @@ import flixel.tweens.FlxEase;
 import flixel.FlxG;
 
 class ModchartLua {
-    public static function implement(lua:Dynamic):Void {
+    public static function implement(lua:Funkinlua):Void {
         if (lua == null) {
             FlxG.log.warn("[ModchartLua] Skipped — Lua instance is null!");
             return;
