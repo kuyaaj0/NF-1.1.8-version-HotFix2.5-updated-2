@@ -58,6 +58,7 @@ import crowplexus.hscript.Expr.Error as IrisError;
 import crowplexus.hscript.Printer;
 #end
 import modchart.Manager;
+import modchart.backend.standalone.Adapter;
 
 import cpp.vm.Gc;
 
@@ -324,6 +325,8 @@ class PlayState extends MusicBeatState
 	public var luaVirtualPad:FlxVirtualPad;
 
 	var diffBotplay:Bool;
+
+	public var modchart:Manager;
 
 	public function new()
 	{
@@ -1216,6 +1219,27 @@ class PlayState extends MusicBeatState
 			generateStaticArrows(0);
 			generateStaticArrows(1);
 
+			if (Manager.instance == null)
+			Manager.instance = new Manager();
+
+			modchart = Manager.instance;
+			addManager(modchart);
+			
+			// === Link Modchart Lua Functions (Psych Adapter) ===
+			Adapter.init(); // Always initialize first (outside try)
+
+			try {
+			var adapter = Adapter.instance;
+			if (adapter != null && Reflect.hasField(adapter, "setupLuaFunctions")) {
+			Reflect.callMethod(adapter, Reflect.field(adapter, "setupLuaFunctions"), []);
+			trace("[Modchart] ✅ Lua functions linked via Psych adapter!");
+			} else {
+			trace("[Modchart] ⚠️ Adapter missing setupLuaFunctions()");
+			}
+			} catch (e:Dynamic) {
+			trace("[Modchart] ❌ Failed to link Lua modchart functions: " + e);
+			}
+
 			for (i in 0...playerStrums.length)
 			{
 				setOnScripts('defaultPlayerStrumX' + i, playerStrums.members[i].x);
@@ -1248,7 +1272,8 @@ class PlayState extends MusicBeatState
 			moveCameraSection();
 
 			
-            //callOnHScript('onModChartStart', [modchart]);
+            callOnLuas('onModChartStart', [modchart]);
+            callOnHScript('onModChartStart', [modchart]);
             
 
 			startTimer = new FlxTimer().start(Conductor.crochet / 1000 / playbackRate, function(tmr:FlxTimer)
@@ -2583,6 +2608,13 @@ class PlayState extends MusicBeatState
 		#end
 
 		callOnScripts('onUpdatePost', [elapsed]);
+
+		// === Update Modchart Manager ===
+		if (Manager.instance != null)
+		Manager.instance.update(elapsed);
+
+		if (modchart != null)
+		modchart.update(elapsed);
 
 		memEnd = Gc.memInfo(0);
 		allocDelta = Std.int(Math.max(0, memEnd - memStart));
@@ -4573,6 +4605,11 @@ class PlayState extends MusicBeatState
 		}
 
 		lastStepHit = curStep;
+
+		// === Call Modchart Step Hooks ===
+		callOnLuas('onStepHit', [curStep]);
+		callOnHScript('onStepHit', [curStep]);
+		
 		setOnScripts('curStep', curStep);
 		callOnScripts('onStepHit');
 	}
@@ -4600,6 +4637,10 @@ class PlayState extends MusicBeatState
 
 		super.beatHit();
 		lastBeatHit = curBeat;
+
+		// === Call Modchart Beat Hooks ===
+		callOnLuas('onBeatHit', [curBeat]);
+		callOnHScript('onBeatHit', [curBeat]);
 
 		setOnScripts('curBeat', curBeat);
 		callOnScripts('onBeatHit');
