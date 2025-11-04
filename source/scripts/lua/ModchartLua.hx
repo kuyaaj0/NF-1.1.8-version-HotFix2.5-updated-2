@@ -85,8 +85,10 @@ class ModchartLua {
             // --- CALLBACKS / REPEATERS ---
             // These require calling a Lua function by name later. Different runtimes expose different call methods.
             // We detect a "call" method first; otherwise we try "pcall" or fallback to logging a warning.
-            var callLuaFunction = function(funcName:String, args:Array<Dynamic> = []) {
-                if (funcName == null) return;
+            var callLuaFunction = function(funcName:String, ?args:Array<Dynamic>) {
+                if (args == null) args = [];
+                Lua.call(lua, funcName, args);
+            
                 try {
                     if (Reflect.hasField(lua, "call")) {
                         Reflect.callMethod(lua, Reflect.field(lua, "call"), [funcName, args]);
