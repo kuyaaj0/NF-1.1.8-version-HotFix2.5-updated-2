@@ -827,9 +827,12 @@ void main() {
 	vec4 texColor = texture2D(bitmap, openfl_TextureCoordv);
     //Screen UV goes from 0 - 1 along each axis
     vec2 screenUV = openfl_TextureCoordv;
-    vec2 p = (2.0 * screenUV) - 1.0;
-    float screenAspect = 1280.0/720.0;
-    p.x *= screenAspect;
+ // shift the origin from top-left (0,0) to screen center (0,0)
+    vec2 p = (screenUV - 0.5) * 2.0;
+
+// maintain correct aspect ratio
+float screenAspect = 1280.0 / 720.0;
+p.x *= screenAspect;
     
     //Normalized Ray Dir
     vec3 dir = vec3(p.x, p.y, 1.0);
@@ -838,7 +841,7 @@ void main() {
     //Define the plane
     vec3 planePosition = vec3(0.0, 0.0, dept);
     vec3 planeRotation = vec3(xrot, yrot, zrot);//this the shit you needa change
-    vec2 planeDimension = vec2(-screenAspect, 1.0);
+    vec2 planeDimension = vec2(-screenAspect * 0.9, 0.9);
     
     vec2 uv = raytraceTexturedQuad(vec3(0), dir, planePosition, planeRotation, planeDimension);
 	
