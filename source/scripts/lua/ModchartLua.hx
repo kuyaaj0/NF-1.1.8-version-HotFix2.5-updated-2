@@ -90,21 +90,21 @@ class ModchartLua {
 
     try {
         // Try using llua-style manual stack call first
-        if (Reflect.hasField(Lua, "getGlobal") && Reflect.hasField(Lua, "pcall")) {
+        if (Reflect.hasField(lua, "getGlobal") && Reflect.hasField(Lua, "pcall")) {
             // Push the function by name
-            Reflect.callMethod(Lua, Reflect.field(Lua, "getGlobal"), [lua, funcName]);
+            Reflect.callMethod(lua, Reflect.field(lua, "getGlobal"), [lua, funcName]);
 
             // Push each argument
             for (arg in args)
-                Reflect.callMethod(Lua, Reflect.field(Lua, "push"), [lua, arg]);
+                Reflect.callMethod(lua, Reflect.field(lua, "push"), [lua, arg]);
 
             // nargs = args.length, nresults = 0
-            var result = Reflect.callMethod(Lua, Reflect.field(Lua, "pcall"), [lua, args.length, 0]);
+            var result = Reflect.callMethod(lua, Reflect.field(lua, "pcall"), [lua, args.length, 0]);
 
             if (result != 0) {
                 FlxG.log.warn("[ModchartLua] Lua function '" + funcName + "' failed: " +
-                    Reflect.callMethod(Lua, Reflect.field(Lua, "toString"), [lua, -1]));
-                Reflect.callMethod(Lua, Reflect.field(Lua, "pop"), [lua, 1]);
+                    Reflect.callMethod(lua, Reflect.field(lua, "toString"), [lua, -1]));
+                Reflect.callMethod(lua, Reflect.field(lua, "pop"), [lua, 1]);
             }
             return;
         }
