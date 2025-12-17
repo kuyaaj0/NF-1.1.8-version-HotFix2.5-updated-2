@@ -97,7 +97,7 @@ class ModchartLua {
 
             // Push each argument
             for (arg in args)
-                Reflect.callMethod(llua.Lua, Reflect.field(lua, "push"), [lua, arg]);
+                Reflect.callMethod(llua.Lua, Reflect.field(llua.Lua, "push"), [lua, arg]);
 
             // nargs = args.length, nresults = 0
             var result = Reflect.callMethod(llua.Lua, Reflect.field(llua.Lua, "pcall"), [lua, args.length, 0]);
