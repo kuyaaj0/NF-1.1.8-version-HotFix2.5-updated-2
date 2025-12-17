@@ -104,8 +104,8 @@ class ModchartLua {
 
             if (result != 0) {
                 FlxG.log.warn("[ModchartLua] Lua function '" + funcName + "' failed: " +
-                    Reflect.callMethod(lua, Reflect.field(lua, "toString"), [lua, -1]));
-                Reflect.callMethod(lua, Reflect.field(lua, "pop"), [lua, 1]);
+                    Reflect.callMethod(llua.Lua, Reflect.field(llua.Lua, "toString"), [lua, -1]);
+                Reflect.callMethod(llua.Lua, Reflect.field(llua.Lua, "pop"), [lua, 1]);
             }
             return;
         }
