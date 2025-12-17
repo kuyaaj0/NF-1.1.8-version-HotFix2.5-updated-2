@@ -90,14 +90,14 @@ class ModchartLua {
 
     try {
         // Try using llua-style manual stack call first
-        if (Reflect.hasField(lua, "getGlobal") && Reflect.hasField(Lua, "pcall")) {
+        if (Reflect.hasField(llua.Lua, "getGlobal") && Reflect.hasField(llua.Lua, "pcall")) {
             // Push the function by name
-            Reflect.callMethod(lua, Reflect.field(lua, "getGlobal"), [lua, funcName]);
-            Reflect.hasField(llua.Lua, "getGlobal")
+            Reflect.callMethod(llua.Lua, Reflect.field(llua.Lua, "getGlobal"), [lua, funcName]);
+            //Reflect.hasField(llua.Lua, "getGlobal")
 
             // Push each argument
             for (arg in args)
-                Reflect.callMethod(lua, Reflect.field(lua, "push"), [lua, arg]);
+                Reflect.callMethod(llua.Lua, Reflect.field(lua, "push"), [lua, arg]);
 
             // nargs = args.length, nresults = 0
             var result = Reflect.callMethod(llua.Lua, Reflect.field(llua.Lua, "pcall"), [lua, args.length, 0]);
