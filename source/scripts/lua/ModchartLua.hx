@@ -93,7 +93,6 @@ class ModchartLua {
         if (Reflect.hasField(llua.Lua, "getGlobal") && Reflect.hasField(llua.Lua, "pcall")) {
             // Push the function by name
             Reflect.callMethod(llua.Lua, Reflect.field(llua.Lua, "getGlobal"), [lua, funcName]);
-            //Reflect.hasField(llua.Lua, "getGlobal")
 
             // Push each argument
             for (arg in args)
@@ -104,7 +103,7 @@ class ModchartLua {
 
             if (result != 0) {
                 FlxG.log.warn("[ModchartLua] Lua function '" + funcName + "' failed: " +
-                    Reflect.callMethod(llua.Lua, Reflect.field(llua.Lua, "toString"), [lua, -1]);
+                    Reflect.callMethod(llua.Lua, Reflect.field(llua.Lua, "toString"), [lua, -1]));
                 Reflect.callMethod(llua.Lua, Reflect.field(llua.Lua, "pop"), [lua, 1]);
             }
             return;
@@ -137,7 +136,6 @@ class ModchartLua {
         FlxG.log.warn("[ModchartLua] Error calling Lua function '" + funcName + "': " + err);
     }
 };
-
             addBinding('callbackMod', function(beat:Float, funcName:String, ?field:Int = -1) {
                 Manager.instance.callback(beat, function(e) {
                     callLuaFunction(funcName, []);
