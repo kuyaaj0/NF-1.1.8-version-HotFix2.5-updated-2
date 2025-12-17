@@ -86,37 +86,56 @@ class ModchartLua {
             // These require calling a Lua function by name later. Different runtimes expose different call methods.
             // We detect a "call" method first; otherwise we try "pcall" or fallback to logging a warning.
             var callLuaFunction = function(funcName:String, ?args:Array<Dynamic>) {
-                if (args == null) args = [];
-                Lua.pcall(lua, funcName, args);
-            
-                try {
-                    if (Reflect.hasField(lua, "call")) {
-                        Reflect.callMethod(lua, Reflect.field(lua, "call"), [funcName, args]);
-                    } else if (Reflect.hasField(lua, "pcall")) {
-                        // some wrappers expose pcall(luaState, funcName, args) semantics - try
-                        Reflect.callMethod(lua, Reflect.field(lua, "pcall"), [funcName, args]);
-                    } else if (Reflect.hasField(lua, "rawcall")) {
-                        Reflect.callMethod(lua, Reflect.field(lua, "rawcall"), [funcName, args]);
-                    } else {
-                        // no reliable call method — attempt a common 'callByName' or warn
-                        if (Reflect.hasField(lua, "functions") && Reflect.getProperty(lua, "functions") != null) {
-                            var fcontainer = Reflect.getProperty(lua, "functions");
-                            if (Reflect.hasField(fcontainer, "exists") && Reflect.callMethod(fcontainer, Reflect.field(fcontainer, "exists"), [funcName]) == true) {
-                                // Try calling via functions container if it has a call method
-                                try {
-                                    Reflect.callMethod(fcontainer, Reflect.field(fcontainer, "call"), [funcName, args]);
-                                } catch(e) {
-                                    FlxG.log.warn("[ModchartLua] Could not call function via functions container: " + e);
-                                }
-                            }
-                        } else {
-                            FlxG.log.warn("[ModchartLua] No callable API found to call Lua function: " + funcName);
-                        }
+    if (args == null) args = [];
+
+    try {
+        // Try using llua-style manual stack call first
+        if (Reflect.hasField(Lua, "getGlobal") && Reflect.hasField(Lua, "pcall")) {
+            // Push the function by name
+            Reflect.callMethod(Lua, Reflect.field(Lua, "getGlobal"), [lua, funcName]);
+
+            // Push each argument
+            for (arg in args)
+                Reflect.callMethod(Lua, Reflect.field(Lua, "push"), [lua, arg]);
+
+            // nargs = args.length, nresults = 0
+            var result = Reflect.callMethod(Lua, Reflect.field(Lua, "pcall"), [lua, args.length, 0]);
+
+            if (result != 0) {
+                FlxG.log.warn("[ModchartLua] Lua function '" + funcName + "' failed: " +
+                    Reflect.callMethod(Lua, Reflect.field(Lua, "toString"), [lua, -1]));
+                Reflect.callMethod(Lua, Reflect.field(Lua, "pop"), [lua, 1]);
+            }
+            return;
+        }
+
+        // Otherwise, try engine-specific call APIs (FunkinLua, etc.)
+        if (Reflect.hasField(lua, "call")) {
+            Reflect.callMethod(lua, Reflect.field(lua, "call"), [funcName, args]);
+        } else if (Reflect.hasField(lua, "pcall")) {
+            Reflect.callMethod(lua, Reflect.field(lua, "pcall"), [funcName, args]);
+        } else if (Reflect.hasField(lua, "rawcall")) {
+            Reflect.callMethod(lua, Reflect.field(lua, "rawcall"), [funcName, args]);
+        } else {
+            // Fallback: look for generic call container
+            if (Reflect.hasField(lua, "functions") && Reflect.getProperty(lua, "functions") != null) {
+                var fcontainer = Reflect.getProperty(lua, "functions");
+                if (Reflect.hasField(fcontainer, "exists") &&
+                    Reflect.callMethod(fcontainer, Reflect.field(fcontainer, "exists"), [funcName]) == true) {
+                    try {
+                        Reflect.callMethod(fcontainer, Reflect.field(fcontainer, "call"), [funcName, args]);
+                    } catch (e) {
+                        FlxG.log.warn("[ModchartLua] Could not call function via container: " + e);
                     }
-                } catch (err) {
-                    FlxG.log.warn("[ModchartLua] Error calling Lua function '" + funcName + "': " + err);
                 }
-            };
+            } else {
+                FlxG.log.warn("[ModchartLua] No callable API found to call Lua function: " + funcName);
+            }
+        }
+    } catch (err) {
+        FlxG.log.warn("[ModchartLua] Error calling Lua function '" + funcName + "': " + err);
+    }
+};
 
             addBinding('callbackMod', function(beat:Float, funcName:String, ?field:Int = -1) {
                 Manager.instance.callback(beat, function(e) {
