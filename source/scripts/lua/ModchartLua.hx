@@ -87,7 +87,7 @@ class ModchartLua {
             // We detect a "call" method first; otherwise we try "pcall" or fallback to logging a warning.
             var callLuaFunction = function(funcName:String, ?args:Array<Dynamic>) {
                 if (args == null) args = [];
-                Lua.call(lua, funcName, args);
+                Lua.pcall(lua, funcName, args);
             
                 try {
                     if (Reflect.hasField(lua, "call")) {
