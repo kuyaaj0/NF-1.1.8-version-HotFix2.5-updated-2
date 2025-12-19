@@ -1,6 +1,7 @@
 package scripts.lua;
 
 #if LUA_ALLOWED
+import llua.lua;
 import modchart.Manager;
 import flixel.tweens.FlxEase;
 import flixel.FlxG;
