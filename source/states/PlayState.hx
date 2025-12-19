@@ -48,6 +48,8 @@ import states.stages.*;
 import states.stages.objects.*;
 #if LUA_ALLOWED
 import scripts.lua.*;
+import modchart.ManagerLua;
+import scripts.lua.ModchartLua;
 #else
 import scripts.lua.LuaUtils;
 #end
@@ -58,8 +60,6 @@ import crowplexus.hscript.Expr.Error as IrisError;
 import crowplexus.hscript.Printer;
 #end
 import modchart.Manager;
-import modchart.ManagerLua;
-import scripts.lua.ModchartLua;
 import modchart.backend.standalone.Adapter;
 
 import cpp.vm.Gc;
