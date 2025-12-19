@@ -58,6 +58,8 @@ import crowplexus.hscript.Expr.Error as IrisError;
 import crowplexus.hscript.Printer;
 #end
 import modchart.Manager;
+import modchart.ManagerLua;
+import scripts.lua.ModchartLua;
 import modchart.backend.standalone.Adapter;
 
 import cpp.vm.Gc;
