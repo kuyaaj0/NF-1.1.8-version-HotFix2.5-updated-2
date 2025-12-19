@@ -1,163 +1,98 @@
 package scripts.lua;
 
 #if LUA_ALLOWED
-import llua.lua;
 import modchart.Manager;
+import modchart.ManagerLua;
 import flixel.tweens.FlxEase;
 import flixel.FlxG;
 import Reflect;
 
+/**
+ * Base Modchart Lua function bindings
+ * by kuya aj & GPT-5 team ✨
+ */
 class ModchartLua {
-    /**
-     * Register modchart functions into the Lua runtime.
-     * Accepts a Dynamic `lua` so it works with different Lua wrappers:
-     * - older llua.State with addLocalCallback (if present)
-     * - FunkinLua style with set(...) (if present)
-     */
     public static function implement(lua:Dynamic):Void {
         if (lua == null) {
             FlxG.log.warn("[ModchartLua] Skipped — Lua instance is null!");
             return;
         }
 
-        // Ensure Manager singleton exists
+        // Ensure Manager exists
         if (Manager.instance == null) Manager.instance = new Manager();
 
-        try {
-            // Helper to add a binding compatible with both APIs
-            var addBinding = function(name:String, fn:Dynamic):Void {
-                // If lua has addLocalCallback (older API), use it
-                if (Reflect.hasField(lua, "addLocalCallback")) {
-                    Reflect.callMethod(lua, Reflect.field(lua, "addLocalCallback"), [name, fn]);
-                    return;
-                }
-
-                // If lua has set(name, func) (FunkinLua / custom API), use it
-                if (Reflect.hasField(lua, "set")) {
-                    Reflect.callMethod(lua, Reflect.field(lua, "set"), [name, fn]);
-                    return;
-                }
-
-                // Fallback: attempt to set a global (if supported)
-                if (Reflect.hasField(lua, "globals") && Reflect.getProperty(lua, "globals") != null) {
-                    var g = Reflect.getProperty(lua, "globals");
-                    Reflect.setField(g, name, fn);
-                    return;
-                }
-
-                // Last resort: warn (can't register)
-                FlxG.log.warn("[ModchartLua] Could not register Lua binding: " + name);
-            };
-
-            // --- BASIC MODIFIERS ---
-            addBinding('addMod', function(name:String, ?field:Int = -1) {
-                Manager.instance.addModifier(name, field);
-            });
-
-            addBinding('setMod', function(name:String, value:Float, ?player:Int = -1, ?field:Int = -1) {
-                Manager.instance.setPercent(name, value, player, field);
-            });
-
-            addBinding('getMod', function(name:String, ?player:Int = 0, ?field:Int = 0):Float {
-                return Manager.instance.getPercent(name, player, field);
-            });
-
-            addBinding('resetMod', function(name:String) {
-                Manager.instance.setPercent(name, 0);
-            });
-
-            // --- EVENTS / EASING ---
-            addBinding('setModAtBeat', function(name:String, beat:Float, value:Float, ?player:Int = -1, ?field:Int = -1) {
-                Manager.instance.set(name, beat, value, player, field);
-            });
-
-            addBinding('easeMod', function(name:String, beat:Float, length:Float, value:Float, ease:String = "linear", ?player:Int = -1, ?field:Int = -1) {
-                var easeFunc = Reflect.field(FlxEase, ease);
-                if (easeFunc == null) easeFunc = FlxEase.linear;
-                Manager.instance.ease(name, beat, length, value, easeFunc, player, field);
-            });
-
-            addBinding('addEaseMod', function(name:String, beat:Float, length:Float, value:Float, ease:String = "linear", ?player:Int = -1, ?field:Int = -1) {
-                var easeFunc = Reflect.field(FlxEase, ease);
-                if (easeFunc == null) easeFunc = FlxEase.linear;
-                Manager.instance.add(name, beat, length, value, easeFunc, player, field);
-            });
-
-            // --- CALLBACKS / REPEATERS ---
-            // These require calling a Lua function by name later. Different runtimes expose different call methods.
-            // We detect a "call" method first; otherwise we try "pcall" or fallback to logging a warning.
-            var callLuaFunction = function(funcName:String, ?args:Array<Dynamic>) {
-    if (args == null) args = [];
-
-    try {
-        // Try using llua-style manual stack call first
-        if (Reflect.hasField(llua.Lua, "getGlobal") && Reflect.hasField(llua.Lua, "pcall")) {
-            // Push the function by name
-            Reflect.callMethod(llua.Lua, Reflect.field(llua.Lua, "getGlobal"), [lua, funcName]);
-
-            // Push each argument
-            for (arg in args)
-                Reflect.callMethod(llua.Lua, Reflect.field(llua.Lua, "push"), [lua, arg]);
-
-            // nargs = args.length, nresults = 0
-            var result = Reflect.callMethod(llua.Lua, Reflect.field(llua.Lua, "pcall"), [lua, args.length, 0]);
-
-            if (result != 0) {
-                FlxG.log.warn("[ModchartLua] Lua function '" + funcName + "' failed: " +
-                    Reflect.callMethod(llua.Lua, Reflect.field(llua.Lua, "toString"), [lua, -1]));
-                Reflect.callMethod(llua.Lua, Reflect.field(llua.Lua, "pop"), [lua, 1]);
-            }
-            return;
-        }
-
-        // Otherwise, try engine-specific call APIs (FunkinLua, etc.)
-        if (Reflect.hasField(lua, "call")) {
-            Reflect.callMethod(lua, Reflect.field(lua, "call"), [funcName, args]);
-        } else if (Reflect.hasField(lua, "pcall")) {
-            Reflect.callMethod(lua, Reflect.field(lua, "pcall"), [funcName, args]);
-        } else if (Reflect.hasField(lua, "rawcall")) {
-            Reflect.callMethod(lua, Reflect.field(lua, "rawcall"), [funcName, args]);
-        } else {
-            // Fallback: look for generic call container
-            if (Reflect.hasField(lua, "functions") && Reflect.getProperty(lua, "functions") != null) {
-                var fcontainer = Reflect.getProperty(lua, "functions");
-                if (Reflect.hasField(fcontainer, "exists") &&
-                    Reflect.callMethod(fcontainer, Reflect.field(fcontainer, "exists"), [funcName]) == true) {
-                    try {
-                        Reflect.callMethod(fcontainer, Reflect.field(fcontainer, "call"), [funcName, args]);
-                    } catch (e) {
-                        FlxG.log.warn("[ModchartLua] Could not call function via container: " + e);
-                    }
-                }
+        var addBinding = function(name:String, fn:Dynamic):Void {
+            if (Reflect.hasField(lua, "addLocalCallback")) {
+                Reflect.callMethod(lua, Reflect.field(lua, "addLocalCallback"), [name, fn]);
+            } else if (Reflect.hasField(lua, "set")) {
+                Reflect.callMethod(lua, Reflect.field(lua, "set"), [name, fn]);
             } else {
-                FlxG.log.warn("[ModchartLua] No callable API found to call Lua function: " + funcName);
+                FlxG.log.warn("[ModchartLua] Could not register binding: " + name);
             }
-        }
-    } catch (err) {
-        FlxG.log.warn("[ModchartLua] Error calling Lua function '" + funcName + "': " + err);
-    }
-};
-            addBinding('callbackMod', function(beat:Float, funcName:String, ?field:Int = -1) {
-                Manager.instance.callback(beat, function(e) {
-                    callLuaFunction(funcName, []);
-                }, field);
-            });
+        };
 
-            addBinding('repeaterMod', function(beat:Float, length:Float, funcName:String, ?field:Int = -1) {
-                Manager.instance.repeater(beat, length, function(e) {
-                    callLuaFunction(funcName, []);
-                }, field);
-            });
+        //------------------------------------------------------------
+        // BASIC MODIFIER FUNCTIONS
+        //------------------------------------------------------------
+        addBinding('addMod', function(name:String, ?field:Int = -1) {
+            Manager.instance.addModifier(name, field);
+        });
 
-            // --- PLAYFIELD UTILITY ---
-            addBinding('addPlayfield', function() {
-                Manager.instance.addPlayfield();
-            });
+        addBinding('setMod', function(name:String, value:Float, ?player:Int = -1, ?field:Int = -1) {
+            Manager.instance.setPercent(name, value, player, field);
+        });
 
-            FlxG.log.add("[ModchartLua] ✅ Fully registered Modchart functions successfully!");
-        } catch (e:Dynamic) {
-            FlxG.log.error("[ModchartLua] ❌ Error while registering Modchart functions: " + e);
-        }
+        addBinding('getMod', function(name:String, ?player:Int = 0, ?field:Int = 0):Float {
+            return Manager.instance.getPercent(name, player, field);
+        });
+
+        addBinding('resetMod', function(name:String) {
+            Manager.instance.setPercent(name, 0);
+        });
+
+        //------------------------------------------------------------
+        // BEAT + EASING CONTROLS
+        //------------------------------------------------------------
+        addBinding('easeMod', function(name:String, beat:Float, length:Float, value:Float, ease:String = "linear", ?player:Int = -1, ?field:Int = -1) {
+            var easeFunc = Reflect.field(FlxEase, ease);
+            if (easeFunc == null) easeFunc = FlxEase.linear;
+            Manager.instance.ease(name, beat, length, value, easeFunc, player, field);
+        });
+
+        addBinding('addEaseMod', function(name:String, beat:Float, length:Float, value:Float, ease:String = "linear", ?player:Int = -1, ?field:Int = -1) {
+            var easeFunc = Reflect.field(FlxEase, ease);
+            if (easeFunc == null) easeFunc = FlxEase.linear;
+            Manager.instance.add(name, beat, length, value, easeFunc, player, field);
+        });
+
+        //------------------------------------------------------------
+        // CALLBACKS + REPEATERS
+        //------------------------------------------------------------
+        addBinding('callbackMod', function(beat:Float, funcName:String, ?field:Int = -1) {
+            Manager.instance.callback(beat, function(e) {
+                if (Reflect.hasField(lua, "call")) Reflect.callMethod(lua, Reflect.field(lua, "call"), [funcName, []]);
+            }, field);
+        });
+
+        addBinding('repeaterMod', function(beat:Float, length:Float, funcName:String, ?field:Int = -1) {
+            Manager.instance.repeater(beat, length, function(e) {
+                if (Reflect.hasField(lua, "call")) Reflect.callMethod(lua, Reflect.field(lua, "call"), [funcName, []]);
+            }, field);
+        });
+
+        //------------------------------------------------------------
+        // PLAYFIELD CONTROL
+        //------------------------------------------------------------
+        addBinding('addPlayfield', function() {
+            Manager.instance.addPlayfield();
+        });
+
+        //------------------------------------------------------------
+        // ADDITIONAL LUA BRIDGE
+        //------------------------------------------------------------
+        ManagerLua.register(lua);
+
+        FlxG.log.add("[ModchartLua] ✅ Modchart functions registered successfully!");
     }
 }
 #end
