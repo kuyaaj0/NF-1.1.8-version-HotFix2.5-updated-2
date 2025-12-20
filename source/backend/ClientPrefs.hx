@@ -101,6 +101,7 @@ import states.TitleState;
 	// Smooth s
 	public var smoothScore:Bool = true;
 	public var smoothHealth:Bool = true;
+	public var commaSeperated:Bool = true;
 
 	// Skin
 	public var noteSkin:String = 'Default';
