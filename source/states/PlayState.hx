@@ -2644,7 +2644,7 @@ class PlayState extends MusicBeatState
 		// === Smooth Score ===
 			if (ClientPrefs.smoothScore)
 			{
-				smoothScores = CoolUtil.smoothLerp(smoothScores, songScore, 0.15);
+				smoothScores = CoolUtil.smoothLerp(smoothScore, songScore, 0.25);
 			}
 				else
 				{
@@ -2654,7 +2654,7 @@ class PlayState extends MusicBeatState
 		// === Smooth Health ===
 			if (ClientPrefs.smoothHealth)
 			{
-				smoothHealths = CoolUtil.smoothLerp(smoothHealths, health, 0.2);
+				smoothHealths = CoolUtil.smoothLerp(smoothHealth, health, 0.3);
 			}
 				else
 				{
@@ -2671,7 +2671,7 @@ class PlayState extends MusicBeatState
         // --- Smooth score value ---
         var displayScore:Float = songScore;
         if (ClientPrefs.smoothScore)
-            displayScore = CoolUtil.smoothLerp(displayScore, songScore, 0.15);
+            displayScore = CoolUtil.smoothLerp(displayScore, songScore, 0.25);
 
         // --- Build score text ---
         scoreTxt.text += " | Score: " + CoolUtil.commaSeparate(Math.floor(displayScore))
