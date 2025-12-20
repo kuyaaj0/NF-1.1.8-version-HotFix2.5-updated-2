@@ -110,5 +110,20 @@ class UIGroup extends OptionCata
 		addOption(option);
 
 		changeHeight(0); //初始化真正的height
+
+		/////--SmoothOption--\\\\\
+
+		var option:Option = new Option(this, 'Smooth Option', Text);
+		addOption(option);
+
+		var option:Option = new Option(this, 'smoothHealth', Bool);
+		addOption(option, true);
+
+		var option:Option = new Option(this, 'smoothScore', Bool);
+		addOption(option, true);
+
+		var option:Option = new Option(this, 'commaSeperated', Bool);
+		addOption(option, true);
+		
 	}
 }
