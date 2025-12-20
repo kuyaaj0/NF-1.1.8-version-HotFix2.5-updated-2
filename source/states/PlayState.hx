@@ -1224,25 +1224,31 @@ class PlayState extends MusicBeatState
 			generateStaticArrows(1);
 
 			if (Manager.instance == null)
-			Manager.instance = new Manager();
-
+				Manager.instance = new Manager();
+			
 			modchart = Manager.instance;
 			addManager(modchart);
 			
-			// === Link Modchart Lua Functions (Psych Adapter) ===
 			#if LUA_ALLOWED
-			Adapter.init(); // Always initialize first (outside try)
-
+				// === Link Modchart Lua Functions (Psych Adapter + NovaFlare Bridge) ===
+				Adapter.init(); // Initialize Psych adapter first
+			
 			try {
-			var adapter = Adapter.instance;
-			if (adapter != null && Reflect.hasField(adapter, "setupLuaFunctions")) {
-			Reflect.callMethod(adapter, Reflect.field(adapter, "setupLuaFunctions"), []);
-			trace("[Modchart] ✅ Lua functions linked via Psych adapter!");
-			} else {
-			trace("[Modchart] ⚠️ Adapter missing setupLuaFunctions()");
-			}
+				var adapter = Adapter.instance;
+				if (adapter != null && Reflect.hasField(adapter, "setupLuaFunctions")) {
+					Reflect.callMethod(adapter, Reflect.field(adapter, "setupLuaFunctions"), []);
+					trace("[Modchart] ✅ Lua functions linked via Psych adapter!");
+				} else {
+					trace("[Modchart] ⚠️ Adapter missing setupLuaFunctions()");
+				}
+				
+				// 🔹 Connect to ModchartLua and ManagerLua (bridge to Manager backend)
+				ModchartLua.implement(lua);
+				ManagerLua.register(lua);
+				trace("[NovaFlare Modchart] ✅ Custom Lua bridge registered successfully!");
+			
 			} catch (e:Dynamic) {
-			trace("[Modchart] ❌ Failed to link Lua modchart functions: " + e);
+				trace("[Modchart] ❌ Failed to link Lua modchart functions: " + e);
 			}
 			#end
 
