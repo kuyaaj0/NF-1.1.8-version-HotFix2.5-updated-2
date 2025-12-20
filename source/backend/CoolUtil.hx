@@ -174,6 +174,51 @@ class CoolUtil
 		#end
 	}
 
+	// ==============================================
+// Smooth Utility and Formatting (by kuya aj & GPT-5 team)
+// ==============================================
+
+/**
+ * Smooth linear interpolation function.
+ * Moves the value toward the target smoothly based on ratio.
+ * Example: smoothLerp(current, target, 0.1)
+ */
+	inline public static function smoothLerp(current:Float, target:Float, ratio:Float):Float
+{
+    return current + (target - current) * ratio;
+}
+
+/**
+ * Format numbers with commas (1,000 / 1,000,000 etc.)
+ * Only applies commas when the number >= 1000.
+ */
+	public static function commaSeparate(num:Float):String
+{
+    var value:Int = Math.floor(num);
+
+    if (value < 1000)
+        return Std.string(value);
+
+    var str:String = Std.string(value);
+    var output:String = '';
+    var count:Int = 0;
+
+    for (i in 0...str.length)
+    {
+        var index = str.length - 1 - i;
+        output = str.charAt(index) + output;
+        count++;
+
+        if (count == 3 && index != 0)
+        {
+            output = ',' + output;
+            count = 0;
+        }
+    }
+
+    return output;
+}
+
 	/**
 	 * 递归读取指定目录及其子目录中的所有文件路径
 	 * @param directory 要搜索的目录路径
