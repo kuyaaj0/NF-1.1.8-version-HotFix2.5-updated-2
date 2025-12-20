@@ -2640,7 +2640,27 @@ class PlayState extends MusicBeatState
 		}
 			*/
 		#end
-	}
+
+		// === Smooth Score ===
+			if (ClientPrefs.smoothScore)
+			{
+				smoothScores = CoolUtil.smoothLerp(smoothScores, songScore, 0.15);
+			}
+				else
+				{
+					smoothScoreValue = songScore;
+				}
+
+		// === Smooth Health ===
+			if (ClientPrefs.smoothHealth)
+			{
+				smoothHealths = CoolUtil.smoothLerp(smoothHealths, health, 0.2);
+			}
+				else
+				{
+					smoothHealthValue = health;
+				}
+		}
 
 	public function scoreTxtUpdate()
 	{
