@@ -98,10 +98,9 @@ import states.TitleState;
 	// Camera s
 	public var camZooms:Bool = true;
 	public var scoreZoom:Bool = true;
-
-	// Smooth Gameplay s
-	public static var smoothScore:Bool = true;
-	public static var smoothHealth:Bool = true;
+	// Smooth s
+	public var smoothScore:Bool = true;
+	public var smoothHealth:Bool = true;
 
 	// Skin
 	public var noteSkin:String = 'Default';
