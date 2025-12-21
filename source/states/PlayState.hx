@@ -1245,7 +1245,10 @@ class PlayState extends MusicBeatState
 				}
 				
 				// 🔹 Connect to ModchartLua and ManagerLua (bridge to Manager backend)
-				ModchartLua.implement(lua);
+				for (lua in luaArray)
+				{
+					ModchartLua.implement(lua);
+				}
 				ManagerLua.register(lua);
 				trace("[NovaFlare Modchart] ✅ Custom Lua bridge registered successfully!");
 			
