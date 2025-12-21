@@ -2693,33 +2693,7 @@ class PlayState extends MusicBeatState
 	// Health icon updaters
 	public dynamic function updateIconsScale(elapsed:Float)
 	{
-		var mult:Float = FlxMath.lerp(1, ipublic function scoreTxtUpdate()
-{
-    scoreTxt.text = "NPS: " + nps + " (Max: " + maxNPS + ")";
-
-    if (ClientPrefs.data.playOpponent ? !cpuControlled_opponent : !cpuControlled)
-    {
-        // --- Smooth score value ---
-        var displayScore:Float = songScore;
-        if (ClientPrefs.smoothScore)
-            displayScore = CoolUtil.smoothLerp(displayScore, songScore, 0.15);
-
-        // --- Build score text ---
-        scoreTxt.text += " | Score: " + CoolUtil.commaSeparate(Math.floor(displayScore))
-            + " | Misses: " + songMisses
-            + " | Accuracy: " + Math.ceil(ratingPercent * 10000) / 100 + '%'
-            + " | ";
-
-        if (ratingName == 'N/A')
-        {
-            scoreTxt.text += 'N/A';
-        }
-        else
-        {
-            scoreTxt.text += '(' + ratingFC + ') ' + ratingName;
-        }
-    }
-}conP1.scale.x, FlxMath.bound((1 - (elapsed * 13 * playbackRate)), 0, 1));
+		var mult:Float = FlxMath.lerp(1, iconP1.scale.x, FlxMath.bound((1 - (elapsed * 13 * playbackRate)), 0, 1));
 		iconP1.scale.set(mult, mult);
 		iconP1.updateHitbox();
 
@@ -2734,6 +2708,7 @@ class PlayState extends MusicBeatState
 		iconP1.x = healthBar.barCenter + (150 * iconP1.scale.x - 150) / 2 - iconOffset;
 		iconP2.x = healthBar.barCenter - (150 * iconP2.scale.x) / 2 - iconOffset * 2;
 	}
+
 
 	var iconsAnimations:Bool = true;
 
