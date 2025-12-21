@@ -113,16 +113,16 @@ class UIGroup extends OptionCata
 
 		/////--Smooth Option--\\\\\
 
-		var option:Option = new Option(this, 'Smooth Option', Text);
+		var option:Option = new Option(this, 'Smooth', TEXT);
 		addOption(option);
 
-		var option:Option = new Option(this, 'smoothHealth', Bool);
+		var option:Option = new Option(this, 'smoothHealth', BOOL);
 		addOption(option, true);
 
-		var option:Option = new Option(this, 'smoothScore', Bool);
+		var option:Option = new Option(this, 'smoothScore', BOOL);
 		addOption(option, true);
 
-		var option:Option = new Option(this, 'commaSeperated', Bool);
+		var option:Option = new Option(this, 'commaSeperated', BOOL);
 		addOption(option, true);
 		
 	}
