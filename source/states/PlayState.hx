@@ -2647,21 +2647,21 @@ class PlayState extends MusicBeatState
 		// === Smooth Score ===
 			if (ClientPrefs.smoothScore)
 			{
-				smoothScores = CoolUtil.smoothLerp(smoothScore, songScore, 0.25);
+				smoothScore = CoolUtil.smoothLerp(smoothScore, songScore, 0.25);
 			}
 				else
 				{
-					smoothScoreValue = songScore;
+					smoothScore = songScore;
 				}
 
 		// === Smooth Health ===
 			if (ClientPrefs.smoothHealth)
 			{
-				smoothHealths = CoolUtil.smoothLerp(smoothHealth, health, 0.3);
+				smoothHealth = CoolUtil.smoothLerp(smoothHealth, health, 0.3);
 			}
 				else
 				{
-					smoothHealthValue = health;
+					smoothHealth = health;
 				}
 		}
 
