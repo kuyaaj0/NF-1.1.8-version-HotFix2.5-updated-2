@@ -2645,7 +2645,7 @@ class PlayState extends MusicBeatState
 		#end
 
 		// === Smooth Score ===
-			if (ClientPrefs.smoothScore)
+			if (ClientPrefs.data.smoothScore)
 			{
 				smoothScore = CoolUtil.smoothLerp(smoothScore, songScore, 0.25);
 			}
@@ -2655,7 +2655,7 @@ class PlayState extends MusicBeatState
 				}
 
 		// === Smooth Health ===
-			if (ClientPrefs.smoothHealth)
+			if (ClientPrefs.data.smoothHealth)
 			{
 				smoothHealth = CoolUtil.smoothLerp(smoothHealth, health, 0.3);
 			}
