@@ -111,7 +111,7 @@ class UIGroup extends OptionCata
 
 		changeHeight(0); //初始化真正的height
 
-		/////--SmoothOption--\\\\\
+		/////--Smooth Option--\\\\\
 
 		var option:Option = new Option(this, 'Smooth Option', Text);
 		addOption(option);
