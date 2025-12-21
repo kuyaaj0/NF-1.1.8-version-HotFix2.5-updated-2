@@ -2673,7 +2673,7 @@ class PlayState extends MusicBeatState
     {
         // --- Smooth score value ---
         var displayScore:Float = songScore;
-        if (ClientPrefs.smoothScore)
+        if (ClientPrefs.data.smoothScore)
             displayScore = CoolUtil.smoothLerp(displayScore, songScore, 0.25);
 
         // --- Build score text ---
