@@ -98,5 +98,19 @@ class UIGroup
 
 		var option:Option = new Option(Language.get('scoreZoom'), 'scoreZoom', BOOL);
 		follow.addOption(option);
+
+		///////////////////////////////
+
+		var option:Option = new Option(Language.get('Smooth'), TEXT);
+		follow.addOption(option);
+
+		var option:Option = new Option(Language.get('smoothHealth'), 'smoothHealth', BOOL);
+		follow.addOption(option);
+
+		var option:Option = new Option(Language.get('smoothScore'), 'smoothScore', BOOL);
+		follow.addOption(option);
+
+		var option:Option = new Option(Language.get('commaSeperated'), 'commaSeperated', BOOL);
+		follow.addOption(option);
 	}
 }
